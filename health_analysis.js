@@ -29,13 +29,58 @@ function resetForm() {
   document.getElementById("condition").value = "";
 }
 
+function generateReport() {
+  const numPatients = patients.length;
+
+  const conditionsCount = {
+    Diabetes: 0,
+    Thyroid: 0,
+    "High Blood Pressure": 0,
+  };
+
+  const genderConditionsCount = {
+    Male: {
+      Diabetes: 0,
+      Thyroid: 0,
+      "High Blood Pressure": 0,
+    },
+    Female: {
+      Diabetes: 0,
+      Thyroid: 0,
+      "High Blood Pressure": 0,
+    },
+  };
+
+  for (const patient of patients) {
+    conditionsCount[patient.condition]++;
+    genderConditionsCount[patient.gender][patient.condition]++;
+  }
+
+  report.innerHTML = `Number of patients: ${numPatients}<br><br>`;
+  report.innerHTML += `Conditions Breakdown:<br>`;
+
+  for (const condition in conditionsCount) {
+    report.innerHTML += `${condition}: ${conditionsCount[condition]}<br>`;
+  }
+
+  report.innerHTML += `<br>Gender-Based Conditions:<br>`;
+
+  for (const gender in genderConditionsCount) {
+    report.innerHTML += `${gender}:<br>`;
+
+    for (const condition in genderConditionsCount[gender]) {
+      report.innerHTML += `&nbsp;&nbsp;${condition}: ${genderConditionsCount[gender][condition]}<br>`;
+    }
+  }
+}
+
 function searchCondition() {
-  const input = document.getElementById('conditionInput').value.toLowerCase();
-  const resultDiv = document.getElementById('result');
+  const input = document.getElementById("conditionInput").value.toLowerCase();
+  const resultDiv = document.getElementById("result");
 
-  resultDiv.innerHTML = '';
+  resultDiv.innerHTML = "";
 
-  fetch('health_analysis.json')
+  fetch("health_analysis.json")
     .then(response => response.json())
     .then(data => {
       const condition = data.conditions.find(
@@ -43,8 +88,8 @@ function searchCondition() {
       );
 
       if (condition) {
-        const symptoms = condition.symptoms.join(', ');
-        const prevention = condition.prevention.join(', ');
+        const symptoms = condition.symptoms.join(", ");
+        const prevention = condition.prevention.join(", ");
         const treatment = condition.treatment;
 
         resultDiv.innerHTML += `<h2>${condition.name}</h2>`;
@@ -53,14 +98,14 @@ function searchCondition() {
         resultDiv.innerHTML += `<p><strong>Prevention:</strong> ${prevention}</p>`;
         resultDiv.innerHTML += `<p><strong>Treatment:</strong> ${treatment}</p>`;
       } else {
-        resultDiv.innerHTML = 'Condition not found.';
+        resultDiv.innerHTML = "Condition not found.";
       }
     })
     .catch(error => {
-      console.error('Error:', error);
-      resultDiv.innerHTML = 'An error occurred while fetching data.';
+      console.error("Error:", error);
+      resultDiv.innerHTML = "An error occurred while fetching data.";
     });
 }
 
-btnSearch.addEventListener('click', searchCondition);
-addPatientButton.addEventListener('click', addPatient);
+addPatientButton.addEventListener("click", addPatient);
+btnSearch.addEventListener("click", searchCondition);
